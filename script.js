@@ -6,7 +6,9 @@ function setup() {
 
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
-  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
+//  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
+  const episodeCard = getAllEpisodes().map(createEpisodeCard);
+  rootElem.append(...episodeCard);
 }
 
 
@@ -35,10 +37,7 @@ function formatTime(timeSecs) {
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
-const episodeCard = getAllEpisodes().map(createEpisodeCard);
+//const episodeCard = getAllEpisodes().map(createEpisodeCard);
 //document.getElementById("root").append(...episodeCard);
-document.body.append(...episodeCard);
-
-//getAllEpisodes()
-//getOneEpisode()
+//document.body.append(...episodeCard);
 
