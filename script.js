@@ -12,7 +12,6 @@ function makePageForEpisodes(episodeList) {
 }
 
 
-window.onload = setup;
 function createEpisodeCard(episode){
   const template = document.getElementById("episode-card");
   const card = template.content.cloneNode(true);
@@ -31,13 +30,7 @@ function formatEpisodeNumber(season, number) {
   return `S${seasonFormatted}E${episodeFormatted}`;
 }
 
-function formatTime(timeSecs) {
-  let minutes = Math.floor(timeSecs / 60);
-  let seconds = timeSecs % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-}
+window.onload = setup;
 
-//const episodeCard = getAllEpisodes().map(createEpisodeCard);
-//document.getElementById("root").append(...episodeCard);
-//document.body.append(...episodeCard);
+
 
