@@ -2,13 +2,22 @@
 let allEpisodes = [];
 function setup() {
   allEpisodes = getAllEpisodes();
+  if (!allEpisodes || allEpisodes.length === 0) {
+    console.error("No episodes found!");
+    return;
+  }
   makePageForEpisodes(allEpisodes);
+  setupSearch();
 }
 
 function makePageForEpisodes(episodeList) {
   const episodesContainer = document.getElementById("episodes-container");
-  const episodeCard = episodeList.map(createEpisodeCard);
-  episodesContainer.append(...episodeCard);
+  episodesContainer.innerHTML = "";
+  const episodeCards = episodeList.map(createEpisodeCard);
+  episodesContainer.append(...episodeCards);
+
+  const countElem = document.getElementById("search-count");
+  countElem.innerHTML = `Episodes found: <span class="count-number">${episodeList.length}</span>`;
 }
 
 function createEpisodeCard(episode){
@@ -32,6 +41,26 @@ function createEpisodeCard(episode){
 function formatEpisodeNumber(season, number) {
   const pad = (num) => String(num).padStart(2, '0');
   return `S${pad(season)}E${pad(number)}`;
+}
+
+function setupSearch() {
+  const searchInput = document.getElementById("search-input");
+  searchInput.addEventListener("input", function () {
+    const query = this.value.trim().toLowerCase();
+
+    if (!query) {
+      makePageForEpisodes(allEpisodes);
+      return;
+    }
+
+    const filteredEpisodes = allEpisodes.filter(episode => {
+      const name = episode.name.toLowerCase();
+      const summary = (episode.summary || "").toLowerCase();
+      return name.includes(query) || summary.includes(query);
+    });
+
+    makePageForEpisodes(filteredEpisodes);
+  });
 }
 
 window.onload = setup;
