@@ -10,6 +10,14 @@
 
   <body>
     <div id="root">
+      <div id="search-container">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search by name or summary..."
+        />
+        <p id="search-count" aria-live="polite"></p>
+      </div>
       <section id="episodes-container"></section>
     </div>
     <template id="episode-card">
@@ -24,6 +32,6 @@
     <script src="episodes.js"></script>
 
     <!-- Loads YOUR javascript code -->
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
   </body>
 </html>
