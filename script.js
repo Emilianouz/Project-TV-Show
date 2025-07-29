@@ -1,36 +1,37 @@
 //You can edit ALL of the code here
+let allEpisodes = [];
 function setup() {
-  const allEpisodes = getAllEpisodes();
+  allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
 }
 
 function makePageForEpisodes(episodeList) {
-  const rootElem = document.getElementById("root");
-//  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
-  const episodeCard = getAllEpisodes().map(createEpisodeCard);
-  rootElem.append(...episodeCard);
+  const episodesContainer = document.getElementById("episodes-container");
+  const episodeCard = episodeList.map(createEpisodeCard);
+  episodesContainer.append(...episodeCard);
 }
 
-
 function createEpisodeCard(episode){
+  const {season, number, name, url, image, summary} = episode;
   const template = document.getElementById("episode-card");
   const card = template.content.cloneNode(true);
-  const episodeFormatted = formatEpisodeNumber(episode.season,episode.number)
-  card.querySelector("h3").textContent = episode.name + ' - ' + episodeFormatted;
- // card.querySelector("a").href = episode.url;
-  card.querySelector("p").innerHTML = episode.summary;
-  card.querySelector("img").src = episode.image.medium;
-  card.querySelector("img").alt = episode.image.name;
+  const episodeFormatted = formatEpisodeNumber(season,number);
+
+  const episodeLink = card.querySelector("h3 a");
+  episodeLink.textContent = `${name} - ${episodeFormatted}`;
+  episodeLink.href = url;
+
+  const episodeImage = card.querySelector("img");
+  episodeImage.src = image.medium;
+  episodeImage.alt = image.name;
+
+  card.querySelector("p").textContent = summary ? summary.replace(/^<p>|<\/p>$/g, '') : "No summary available.";
   return card;
 }
 
 function formatEpisodeNumber(season, number) {
-  const seasonFormatted = String(season).padStart(2, '0');
-  const episodeFormatted = String(number).padStart(2, '0');
-  return `S${seasonFormatted}E${episodeFormatted}`;
+  const pad = (num) => String(num).padStart(2, '0');
+  return `S${pad(season)}E${pad(number)}`;
 }
 
 window.onload = setup;
-
-
-
