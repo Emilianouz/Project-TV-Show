@@ -13,6 +13,26 @@ body, p, h3, img{
   font-size: 0.9rem;
   background-color: var(--bg-color);
 }
+#search-container {
+  padding: 10px;
+  display: flex;
+  gap: 20px;
+  text-align: center;
+  font-family: monospace;
+}
+#search-input {
+  width: 300px;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid rgb(101, 100, 100);
+  border-radius: 8px
+}
+.count-number {
+  margin-left: 5px;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: var(--title-text-color);
+}
 #episodes-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -50,7 +70,7 @@ img {
   margin: 0 auto;
   max-width: 90%;
   border-radius: 14px;
-  padding: 10px;
+  padding: 20px 10px 10px 10px;
 }
 p {
   padding: 10px 20px;
