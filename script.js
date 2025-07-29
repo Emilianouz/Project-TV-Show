@@ -15,9 +15,6 @@ function makePageForEpisodes(episodeList) {
   episodesContainer.innerHTML = "";
   const episodeCards = episodeList.map(createEpisodeCard);
   episodesContainer.append(...episodeCards);
-
-  const countElem = document.getElementById("search-count");
-  countElem.innerHTML = `Episodes found: <span class="count-number">${episodeList.length}</span>`;
 }
 
 function createEpisodeCard(episode){
@@ -45,11 +42,14 @@ function formatEpisodeNumber(season, number) {
 
 function setupSearch() {
   const searchInput = document.getElementById("search-input");
+  const countElem = document.getElementById("search-count");
+
   searchInput.addEventListener("input", function () {
     const query = this.value.trim().toLowerCase();
 
     if (!query) {
       makePageForEpisodes(allEpisodes);
+      countElem.style.display = "none";
       return;
     }
 
@@ -60,6 +60,9 @@ function setupSearch() {
     });
 
     makePageForEpisodes(filteredEpisodes);
+
+    countElem.innerHTML = `Episodes found: <span class="count-number">${filteredEpisodes.length}</span>`;
+     countElem.style.display = "block";
   });
 }
 
