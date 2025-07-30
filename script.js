@@ -1,5 +1,12 @@
 //You can edit ALL of the code here
 let allEpisodes = [];
+
+const selectElem = document.getElementById("search-select");
+const searchInput = document.getElementById("search-input");
+const episodesContainer = document.getElementById("episodes-container");
+const countElem = document.getElementById("search-count");
+const template = document.getElementById("episode-card");
+
 function setup() {
   allEpisodes = getAllEpisodes();
   if (!allEpisodes || allEpisodes.length === 0) {
@@ -7,19 +14,19 @@ function setup() {
     return;
   }
   makePageForEpisodes(allEpisodes);
+  populateEpisodeSelect(allEpisodes);
+  setupEpisodeSelect();
   setupSearch();
 }
 
 function makePageForEpisodes(episodeList) {
-  const episodesContainer = document.getElementById("episodes-container");
   episodesContainer.innerHTML = "";
   const episodeCards = episodeList.map(createEpisodeCard);
   episodesContainer.append(...episodeCards);
 }
 
-function createEpisodeCard(episode){
-  const {season, number, name, url, image, summary} = episode;
-  const template = document.getElementById("episode-card");
+function createEpisodeCard(episode) {
+  const { season, number, name, url, image, summary } = episode;
   const card = template.content.cloneNode(true);
   const episodeFormatted = formatEpisodeNumber(season,number);
 
@@ -31,7 +38,9 @@ function createEpisodeCard(episode){
   episodeImage.src = image.medium;
   episodeImage.alt = image.name;
 
-  card.querySelector("p").textContent = summary ? summary.replace(/^<p>|<\/p>$/g, '') : "No summary available.";
+  card.querySelector("p").textContent = summary
+    ? summary.replace(/^<p>|<\/p>$/g, "")
+    : "No summary available.";
   return card;
 }
 
@@ -40,29 +49,56 @@ function formatEpisodeNumber(season, number) {
   return `S${pad(season)}E${pad(number)}`;
 }
 
-function setupSearch() {
-  const searchInput = document.getElementById("search-input");
-  const countElem = document.getElementById("search-count");
+function filterAndRender() {
+  const selectedIndex = selectElem.value;
+  const query = searchInput.value.trim().toLowerCase();
 
-  searchInput.addEventListener("input", function () {
-    const query = this.value.trim().toLowerCase();
+  let filtered = [...allEpisodes];
 
-    if (!query) {
-      makePageForEpisodes(allEpisodes);
-      countElem.style.display = "none";
-      return;
-    }
+  // Select filter
+  if (selectedIndex !== "") {
+    filtered = filtered.filter((_, i) => i === Number(selectedIndex));
+  }
 
-    const filteredEpisodes = allEpisodes.filter(episode => {
+  // Search filter
+  if (query) {
+    filtered = filtered.filter((episode) => {
       const name = episode.name.toLowerCase();
       const summary = (episode.summary || "").toLowerCase();
       return name.includes(query) || summary.includes(query);
     });
+  }
 
-    makePageForEpisodes(filteredEpisodes);
+  makePageForEpisodes(filtered);
 
-    countElem.innerHTML = `Episodes found: <span class="count-number">${filteredEpisodes.length}</span>`;
-     countElem.style.display = "block";
+  if (query || selectedIndex !== "") {
+    countElem.innerHTML = `Episodes found: <span class="count-number">${filtered.length}</span>`;
+    countElem.style.display = "block";
+  } else {
+    countElem.style.display = "none";
+  }
+}
+
+function populateEpisodeSelect(episodeList) {
+  selectElem.innerHTML = `<option value="">Select an episode</option>`;
+  episodeList.forEach((ep, index) => {
+    const code = formatEpisodeNumber(ep.season, ep.number);
+    const option = document.createElement("option");
+    option.value = index;
+    option.textContent = `${code} - ${ep.name}`;
+    selectElem.appendChild(option);
+  });
+}
+
+function setupEpisodeSelect() {
+  selectElem.addEventListener("change", filterAndRender);
+}
+
+function setupSearch() {
+  searchInput.addEventListener("input", () => {
+    // Reset select when typing in input
+    selectElem.value = "";
+    filterAndRender();
   });
 }
 
