@@ -11,18 +11,20 @@
   <body>
     <div id="root">
       <div id="search-container">
-        <input
-          type="text"
-          id="search-input"
-          placeholder="Search by name or summary..."
-        />
+        <label>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by name or summary..."
+          />
+        </label>
         <p id="search-count" aria-live="polite"></p>
       </div>
       <section id="episodes-container"></section>
     </div>
     <template id="episode-card">
       <article>
-        <h3><a href="">Name Episode</a></h3>
+        <h3><a href="" target="_blank" rel="noopener noreferrer">Name Episode</a></h3>
         <img src="" alt="">
         <p>Summary</p>
       </article>
