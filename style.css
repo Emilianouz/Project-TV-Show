@@ -3,15 +3,18 @@ body, p, h3, img{
   padding: 0;
   box-sizing: border-box;
 }
+html, body {
+  height: 100%;
+  background-color: rgb(231, 230, 230);
+  font-family: fantasy;
+  font-size: 0.9rem;
+}
 #root {
   --bg-color: rgb(231, 230, 230);
   --article-bg-color: rgb(255, 255, 255);
   --title-text-color: rgb(29, 28, 28);
   --text-color: rgb(169, 169, 169);
   padding: 20px;
-  font-family: fantasy;
-  font-size: 0.9rem;
-  background-color: var(--bg-color);
 }
 #search-container {
   padding: 10px;
@@ -20,12 +23,33 @@ body, p, h3, img{
   text-align: center;
   font-family: monospace;
 }
-#search-input {
-  width: 300px;
+#search-select {
+  height: 40px;
+  line-height: 1.2;
+  /* Optional: remove default arrow */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='10' viewBox='0 0 24 24' width='10' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 30px; /* leave space for arrow */
+  cursor: pointer;
+}
+
+#search-select, #search-input {
   padding: 10px;
   font-size: 1rem;
   border: 1px solid rgb(101, 100, 100);
-  border-radius: 8px
+  border-radius: 8px;
+  background-color:var(--article-bg-color);
+}
+#search-input {
+  width: 300px;
+}
+#search-count {
+  display: none;
 }
 .count-number {
   margin-left: 5px;
