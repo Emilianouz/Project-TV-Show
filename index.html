@@ -10,14 +10,29 @@
 
   <body>
     <div id="root">
-      <template id="episode-card">
-        <section>
-          <h3><a href="">Name Episode</a></h3>
-          <img src="" alt="">
-          <p>Summary</p>
-        </section>
-      </template>    
+      <div id="search-container">
+        <select id="search-select">
+          <option value="">Select an episode</option>
+        </select>
+        
+        <label>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by name or summary..."
+          />
+        </label>
+        <p id="search-count" aria-live="polite"></p>
+      </div>
+      <section id="episodes-container"></section>
     </div>
+    <template id="episode-card">
+      <article>
+        <h3><a href="" target="_blank" rel="noopener noreferrer">Name Episode</a></h3>
+        <img src="" alt="">
+        <p>Summary</p>
+      </article>
+    </template>
 
     <!-- Loads a provided function called getAllEpisodes() which returns all episodes -->
     <script src="episodes.js"></script>
