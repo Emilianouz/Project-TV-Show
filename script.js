@@ -1,4 +1,5 @@
 //You can edit ALL of the code here
+// https://api.tvmaze.com/shows/82/episodes
 const state = {
   allEpisodes: [],
   filtered: [],
@@ -10,14 +11,27 @@ const searchInput = document.getElementById("search-input");
 const episodesContainer = document.getElementById("episodes-container");
 const countElem = document.getElementById("search-count");
 const template = document.getElementById("episode-card");
+const loadingElem = document.getElementById("loading"); /**** */
+if (loadingElem) loadingElem.style.display = "block"; /**** */
+
+function fetchFilms(){
+  return fetch("https://api.tvmaze.com/shows/82/episodes").then(function (data) {
+    return data.json();
+  });
+}
+fetchFilms().then(function (films){
+  state.allEpisodes = films;
+})
 
 function setup() {
-  state.allEpisodes = getAllEpisodes();
+  
   state.filtered = state.allEpisodes;
   if (!state.allEpisodes || state.allEpisodes.length === 0) {
-    console.error("No episodes found!");
+    alert("No episodes found!");
+    loadingElem.textContent = "Failed to load episodes.";
+    loadingElem.style.display = "block"; /**** */
     return;
-  }
+  } else { if (loadingElem) loadingElem.style.display = "none";} /*** */
   makePageForEpisodes(state.allEpisodes);
   populateEpisodeSelect(state.allEpisodes);
   setupEpisodeSelect();
