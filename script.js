@@ -1,5 +1,9 @@
 //You can edit ALL of the code here
 // https://api.tvmaze.com/shows/82/episodes
+
+// Centralize endpoint for reuse and readability
+const endpoint = "https://api.tvmaze.com/shows/82/episodes";
+
 const state = {
   allEpisodes: [],
   filtered: [],
@@ -14,28 +18,39 @@ const template = document.getElementById("episode-card");
 const loadingElem = document.getElementById("loading"); /**** */
 if (loadingElem) loadingElem.style.display = "block"; /**** */
 
-function fetchFilms(){
-  return fetch("https://api.tvmaze.com/shows/82/episodes").then(function (data) {
-    return data.json();
-  });
+// Use async/await for clearer syntax and modern practice
+async function fetchEpisodes(){
+  const res = await fetch(endpoint);
+  if (!res.ok) {
+    throw new Error(`HTTP error: ${res.status}`);
+  }
+  return res.json();
 }
-fetchFilms().then(function (films){
-  state.allEpisodes = films;
-})
 
 function setup() {
-  
-  state.filtered = state.allEpisodes;
-  if (!state.allEpisodes || state.allEpisodes.length === 0) {
-    alert("No episodes found!");
-    loadingElem.textContent = "Failed to load episodes.";
-    loadingElem.style.display = "block"; /**** */
-    return;
-  } else { if (loadingElem) loadingElem.style.display = "none";} /*** */
-  makePageForEpisodes(state.allEpisodes);
-  populateEpisodeSelect(state.allEpisodes);
-  setupEpisodeSelect();
-  setupSearch();
+  // Move this logic to keep all initialization steps in one place
+  fetchEpisodes()
+  .then((episodes) => {
+    state.allEpisodes = episodes;
+    state.filtered = episodes;
+
+    if (!episodes || episodes.length === 0) {
+      // Handle loading error here
+      handleError("Failed to load episodes.")
+      return;
+    }
+
+    if (loadingElem) loadingElem.style.display = "none"; /*** */
+
+    makePageForEpisodes(state.filtered);
+    populateEpisodeSelect(episodes);
+    setupEpisodeSelect();
+    setupSearch();
+  })
+  .catch(() => {
+    // Handle fetch error here
+    handleError("Could not load episodes. Please try again later.")
+  });
 }
 
 function makePageForEpisodes(episodeList) {
@@ -54,8 +69,8 @@ function createEpisodeCard(episode) {
   episodeLink.textContent = `${name} - ${episodeFormatted}`;
   episodeLink.href = url;
   const episodeImage = card.querySelector("img");
-  episodeImage.src = image.medium;
-  episodeImage.alt = image.name;
+  episodeImage.src = image?.medium || ""; // Avoid error if image is missing
+  episodeImage.alt = name;  // Use `name` instead of `image.name`
 
   card.querySelector("p").textContent = summary
     ? summary.replace(/^<p>|<\/p>$/g, "")
@@ -69,30 +84,24 @@ function formatEpisodeNumber(season, number) {
 }
 
 function filterAndRender() {
- state.selectedIndex = selectElem.value; 
- state.query = searchInput.value.trim().toLowerCase(); 
+ state.selectedIndex = selectElem.value;
+ state.query = searchInput.value.trim().toLowerCase();
 
   // Select filter
   if (state.selectedIndex !== "") {
     state.filtered = state.allEpisodes.filter((_, i) => i === Number(state.selectedIndex));
-  } else {
-    if (!state.query){
-      state.filtered = state.allEpisodes;
-    }
-  }
-
-  // Search filter
-  if (state.query) {
+    // Search filter
+  } else if (state.query) {
     state.filtered = state.allEpisodes.filter((episode) => {
       const name = episode.name.toLowerCase();
       const summary = (episode.summary || "").toLowerCase();
       return name.includes(state.query) || summary.includes(state.query);
     });
+  } else {
+    state.filtered = state.allEpisodes;
   }
 
   makePageForEpisodes(state.filtered);
-  countElem.innerHTML = `Displaying <span class="count-number">${state.filtered.length} / ${state.allEpisodes.length}</span> episodes`;
-  countElem.style.display = "block";
 }
 
 function populateEpisodeSelect(episodeList) {
@@ -107,7 +116,11 @@ function populateEpisodeSelect(episodeList) {
 }
 
 function setupEpisodeSelect() {
-  selectElem.addEventListener("change", filterAndRender);
+  selectElem.addEventListener("change", () => {
+    // Reset an input when use the select
+    searchInput.value = "";
+    filterAndRender();
+  });
 }
 
 function setupSearch() {
@@ -116,6 +129,17 @@ function setupSearch() {
     selectElem.value = "";
     filterAndRender();
   });
+}
+
+// function to handle error
+function handleError(message) {
+   if (loadingElem) {
+    console.error(message);
+    loadingElem.textContent = message;
+    loadingElem.style.display = "block";
+  } else {
+    alert(message);
+  }
 }
 
 window.onload = setup;
