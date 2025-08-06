@@ -16,7 +16,6 @@ const episodesContainer = document.getElementById("episodes-container");
 const countElem = document.getElementById("search-count");
 const template = document.getElementById("episode-card");
 const loadingElem = document.getElementById("loading"); /**** */
-if (loadingElem) loadingElem.style.display = "block"; /**** */
 
 // Use async/await for clearer syntax and modern practice
 async function fetchEpisodes(){
@@ -28,6 +27,7 @@ async function fetchEpisodes(){
 }
 
 function setup() {
+  showLoading("Loading episodes...");
   // Move this logic to keep all initialization steps in one place
   fetchEpisodes()
   .then((episodes) => {
@@ -40,7 +40,7 @@ function setup() {
       return;
     }
 
-    if (loadingElem) loadingElem.style.display = "none"; /*** */
+    hideLoading();
 
     makePageForEpisodes(state.filtered);
     populateEpisodeSelect(episodes);
@@ -48,6 +48,7 @@ function setup() {
     setupSearch();
   })
   .catch(() => {
+    hideLoading();
     // Handle fetch error here
     handleError("Could not load episodes. Please try again later.")
   });
@@ -140,6 +141,19 @@ function handleError(message) {
   } else {
     alert(message);
   }
+}
+
+// function to handle loading
+function showLoading(message = "Loading...") {
+  if (loadingElem) {
+    loadingElem.textContent = message;
+    loadingElem.style.display = "block";
+  }
+}
+
+// hide loading
+function hideLoading() {
+  if (loadingElem) loadingElem.style.display = "none";
 }
 
 window.onload = setup;
