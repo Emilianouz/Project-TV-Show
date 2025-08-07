@@ -87,6 +87,15 @@ function populateShowSelect(shows) {
   });
 }
 
+function setupShowSelect() {
+  showSelectElem.addEventListener("change", () => {
+    const showId = showSelectElem.value;
+    if (showId) {
+      loadEpisodesForShow(showId);
+    }
+  });
+}
+
 function setup() {
   showLoading("Loading episodes...");
   // Move this logic to keep all initialization steps in one place
