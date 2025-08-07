@@ -190,17 +190,10 @@ function handleError(message) {
   }
 }
 
-// function to handle loading
-function showLoading(message = "Loading...") {
-  if (loadingElem) {
-    loadingElem.textContent = message;
-    loadingElem.style.display = "block";
-  }
-}
-
-// hide loading
-function hideLoading() {
-  if (loadingElem) loadingElem.style.display = "none";
+function setLoading(visible, msg = "Loading...") {
+  if (!loadingElem) return;
+  loadingElem.textContent = msg;
+  loadingElem.style.display = visible ? "block" : "none";
 }
 
 window.onload = setup;
