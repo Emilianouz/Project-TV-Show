@@ -10,6 +10,9 @@ const getEpisodesEndpoint = (showId) => `${API_BASE}/shows/${showId}/episodes`;
 
 
 const state = {
+  allShows: [],
+  episodesCache: {},
+  currentShowId: null,
   allEpisodes: [],
   filtered: [],
   selectedIndex: null,
@@ -20,7 +23,8 @@ const searchInput = document.getElementById("search-input");
 const episodesContainer = document.getElementById("episodes-container");
 const countElem = document.getElementById("search-count");
 const template = document.getElementById("episode-card");
-const loadingElem = document.getElementById("loading"); /**** */
+const loadingElem = document.getElementById("loading");
+const showSelectElem = document.getElementById("show-select");
 
 // Use async/await for clearer syntax and modern practice
 async function fetchEpisodes(){
