@@ -26,11 +26,10 @@ const template = document.getElementById("episode-card");
 const loadingElem = document.getElementById("loading");
 const showSelectElem = document.getElementById("show-select");
 
-// Use async/await for clearer syntax and modern practice
-async function fetchEpisodes(){
-  const res = await fetch(endpoint);
+async function fetchAllShows() {
+  const res = await fetch(allShowsEndpoint);
   if (!res.ok) {
-    throw new Error(`HTTP error: ${res.status}`);
+    throw new Error(`Failed to fetch shows: ${res.status}`);
   }
   return res.json();
 }
