@@ -34,6 +34,22 @@ async function fetchAllShows() {
   return res.json();
 }
 
+async function fetchEpisodesForShow(showId) {
+  const endpoint = getEpisodesEndpoint(showId);
+
+  if (state.episodesCache[showId]) {
+    return state.episodesCache[showId];
+  }
+
+  const res = await fetch(endpoint);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch episodes for show ${showId}`);
+  }
+  const data = await res.json();
+  state.episodesCache[showId] = data;
+  return data;
+}
+
 function setup() {
   showLoading("Loading episodes...");
   // Move this logic to keep all initialization steps in one place
