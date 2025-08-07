@@ -50,6 +50,29 @@ async function fetchEpisodesForShow(showId) {
   return data;
 }
 
+async function loadEpisodesForShow(showId) {
+  state.currentShowId = showId;
+  state.query = "";
+  state.selectedIndex = null;
+  searchInput.value = "";
+
+  setLoading(true, "Loading episodes...");
+
+  fetchEpisodesForShow(showId)
+    .then((episodes) => {
+      setLoading(false);
+      state.allEpisodes = episodes;
+      state.filtered = episodes;
+
+      makePageForEpisodes(state.filtered);
+    })
+    .catch((error) => {
+      alert(error.message);
+      setLoading(false);
+      handleError("Could not load episodes for selected show.");
+    });
+}
+
 function setup() {
   showLoading("Loading episodes...");
   // Move this logic to keep all initialization steps in one place
