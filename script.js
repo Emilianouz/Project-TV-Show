@@ -65,12 +65,26 @@ async function loadEpisodesForShow(showId) {
       state.filtered = episodes;
 
       makePageForEpisodes(state.filtered);
+      populateEpisodeSelect(episodes);
     })
     .catch((error) => {
       alert(error.message);
       setLoading(false);
       handleError("Could not load episodes for selected show.");
     });
+}
+
+function populateShowSelect(shows) {
+  // sort alphabetically (case-insensitive)
+  shows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+
+  showSelectElem.innerHTML = `<option value="">Select a show</option>`;
+  shows.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    showSelectElem.appendChild(option);
+  });
 }
 
 function setup() {
@@ -179,7 +193,6 @@ function setupSearch() {
   });
 }
 
-// function to handle error
 function handleError(message) {
    if (loadingElem) {
     console.error(message);
