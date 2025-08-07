@@ -8,7 +8,6 @@ const allShowsEndpoint = `${API_BASE}/shows`;
 // Endpoint to get episodes for a specific show
 const getEpisodesEndpoint = (showId) => `${API_BASE}/shows/${showId}/episodes`;
 
-
 const state = {
   allShows: [],
   episodesCache: {},
@@ -93,34 +92,6 @@ function setupShowSelect() {
     if (showId) {
       loadEpisodesForShow(showId);
     }
-  });
-}
-
-function setup() {
-  showLoading("Loading episodes...");
-  // Move this logic to keep all initialization steps in one place
-  fetchEpisodes()
-  .then((episodes) => {
-    state.allEpisodes = episodes;
-    state.filtered = episodes;
-
-    if (!episodes || episodes.length === 0) {
-      // Handle loading error here
-      handleError("Failed to load episodes.")
-      return;
-    }
-
-    hideLoading();
-
-    makePageForEpisodes(state.filtered);
-    populateEpisodeSelect(episodes);
-    setupEpisodeSelect();
-    setupSearch();
-  })
-  .catch(() => {
-    hideLoading();
-    // Handle fetch error here
-    handleError("Could not load episodes. Please try again later.")
   });
 }
 
@@ -216,6 +187,30 @@ function setLoading(visible, msg = "Loading...") {
   if (!loadingElem) return;
   loadingElem.textContent = msg;
   loadingElem.style.display = visible ? "block" : "none";
+}
+
+function setup() {
+  setLoading(true, "Loading shows...");
+
+  fetchAllShows()
+    .then((shows) => {
+      setLoading(false);
+      state.allShows = shows;
+      populateShowSelect(shows);
+      setupShowSelect();
+      setupSearch();
+      setupEpisodeSelect();
+
+      // Automatically select and load show ID 82.
+      // Could be replaced with any other show ID or removed.
+      const defaultShowId = "82";
+      showSelectElem.value = defaultShowId;
+      loadEpisodesForShow(defaultShowId);
+    })
+    .catch((err) => {
+      setLoading(false);
+      handleError(`Could not load show list. ${err.message}`);
+    });
 }
 
 window.onload = setup;
