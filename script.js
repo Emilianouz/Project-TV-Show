@@ -1,8 +1,13 @@
 //You can edit ALL of the code here
-// https://api.tvmaze.com/shows/82/episodes
 
-// Centralize endpoint for reuse and readability
-const endpoint = "https://api.tvmaze.com/shows/82/episodes";
+const API_BASE = "https://api.tvmaze.com";
+
+// All shows endpoint
+const allShowsEndpoint = `${API_BASE}/shows`;
+
+// Endpoint to get episodes for a specific show
+const getEpisodesEndpoint = (showId) => `${API_BASE}/shows/${showId}/episodes`;
+
 
 const state = {
   allEpisodes: [],
