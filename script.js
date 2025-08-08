@@ -1,10 +1,17 @@
 //You can edit ALL of the code here
-// https://api.tvmaze.com/shows/82/episodes
 
-// Centralize endpoint for reuse and readability
-const endpoint = "https://api.tvmaze.com/shows/82/episodes";
+const API_BASE = "https://api.tvmaze.com";
+
+// All shows endpoint
+const allShowsEndpoint = `${API_BASE}/shows`;
+
+// Endpoint to get episodes for a specific show
+const getEpisodesEndpoint = (showId) => `${API_BASE}/shows/${showId}/episodes`;
 
 const state = {
+  allShows: [],
+  episodesCache: {},
+  currentShowId: null,
   allEpisodes: [],
   filtered: [],
   selectedIndex: null,
@@ -15,42 +22,76 @@ const searchInput = document.getElementById("search-input");
 const episodesContainer = document.getElementById("episodes-container");
 const countElem = document.getElementById("search-count");
 const template = document.getElementById("episode-card");
-const loadingElem = document.getElementById("loading"); /**** */
+const loadingElem = document.getElementById("loading");
+const showSelectElem = document.getElementById("show-select");
 
-// Use async/await for clearer syntax and modern practice
-async function fetchEpisodes(){
-  const res = await fetch(endpoint);
+async function fetchAllShows() {
+  const res = await fetch(allShowsEndpoint);
   if (!res.ok) {
-    throw new Error(`HTTP error: ${res.status}`);
+    throw new Error(`Failed to fetch shows: ${res.status}`);
   }
   return res.json();
 }
 
-function setup() {
-  showLoading("Loading episodes...");
-  // Move this logic to keep all initialization steps in one place
-  fetchEpisodes()
-  .then((episodes) => {
-    state.allEpisodes = episodes;
-    state.filtered = episodes;
+async function fetchEpisodesForShow(showId) {
+  const endpoint = getEpisodesEndpoint(showId);
 
-    if (!episodes || episodes.length === 0) {
-      // Handle loading error here
-      handleError("Failed to load episodes.")
-      return;
+  if (state.episodesCache[showId]) {
+    return state.episodesCache[showId];
+  }
+
+  const res = await fetch(endpoint);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch episodes for show ${showId}`);
+  }
+  const data = await res.json();
+  state.episodesCache[showId] = data;
+  return data;
+}
+
+async function loadEpisodesForShow(showId) {
+  state.currentShowId = showId;
+  state.query = "";
+  state.selectedIndex = null;
+  searchInput.value = "";
+
+  setLoading(true, "Loading episodes...");
+
+  fetchEpisodesForShow(showId)
+    .then((episodes) => {
+      setLoading(false);
+      state.allEpisodes = episodes;
+      state.filtered = episodes;
+
+      makePageForEpisodes(state.filtered);
+      populateEpisodeSelect(episodes);
+    })
+    .catch((error) => {
+      alert(error.message);
+      setLoading(false);
+      handleError("Could not load episodes for selected show.");
+    });
+}
+
+function populateShowSelect(shows) {
+  // sort alphabetically (case-insensitive)
+  shows.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+
+  showSelectElem.innerHTML = `<option value="">Select a show</option>`;
+  shows.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    showSelectElem.appendChild(option);
+  });
+}
+
+function setupShowSelect() {
+  showSelectElem.addEventListener("change", () => {
+    const showId = showSelectElem.value;
+    if (showId) {
+      loadEpisodesForShow(showId);
     }
-
-    hideLoading();
-
-    makePageForEpisodes(state.filtered);
-    populateEpisodeSelect(episodes);
-    setupEpisodeSelect();
-    setupSearch();
-  })
-  .catch(() => {
-    hideLoading();
-    // Handle fetch error here
-    handleError("Could not load episodes. Please try again later.")
   });
 }
 
@@ -132,7 +173,6 @@ function setupSearch() {
   });
 }
 
-// function to handle error
 function handleError(message) {
    if (loadingElem) {
     console.error(message);
@@ -143,17 +183,34 @@ function handleError(message) {
   }
 }
 
-// function to handle loading
-function showLoading(message = "Loading...") {
-  if (loadingElem) {
-    loadingElem.textContent = message;
-    loadingElem.style.display = "block";
-  }
+function setLoading(visible, msg = "Loading...") {
+  if (!loadingElem) return;
+  loadingElem.textContent = msg;
+  loadingElem.style.display = visible ? "block" : "none";
 }
 
-// hide loading
-function hideLoading() {
-  if (loadingElem) loadingElem.style.display = "none";
+function setup() {
+  setLoading(true, "Loading shows...");
+
+  fetchAllShows()
+    .then((shows) => {
+      setLoading(false);
+      state.allShows = shows;
+      populateShowSelect(shows);
+      setupShowSelect();
+      setupSearch();
+      setupEpisodeSelect();
+
+      // Automatically select and load show ID 82.
+      // Could be replaced with any other show ID or removed.
+      const defaultShowId = "82";
+      showSelectElem.value = defaultShowId;
+      loadEpisodesForShow(defaultShowId);
+    })
+    .catch((err) => {
+      setLoading(false);
+      handleError(`Could not load show list. ${err.message}`);
+    });
 }
 
 window.onload = setup;
