@@ -64,8 +64,8 @@ html, body {
   gap: 20px;
 }
 .episode-article {
-  width: 300px;
-  height: 480px;
+  width: 310px;
+  min-height: 480px;
   align-items: center;
   border-radius: 10px;
   background-color: var(--article-bg-color);
@@ -96,6 +96,7 @@ a {
   padding: 20px 10px 10px 10px;
 }
 .episode-summary {
+  font-size: 0.8rem;
   padding: 10px 20px;
   color: var(--text-color);
   line-height: 1.4;
