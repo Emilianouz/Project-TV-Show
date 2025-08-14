@@ -11,34 +11,47 @@
   <body>
     <div id="root">
       <div id="search-container">
-        <select id="show-select">
-          <option value="">Select a show</option>
-        </select>
-        <select id="search-select">
-          <option value="">Select an episode</option>
-        </select>
-        
-        <label>
-          <input
-            type="text"
-            id="search-input"
-            placeholder="Search by name or summary..."
-          />
-        </label>
         <p id="search-count" aria-live="polite"></p>
       </div>
       <section id="episodes-container">
         <div id="loading"></div>
       </section>
+      <section id="shows-container"></section>
     </div>
     <template id="episode-card">
-      <article>
+      <article class="episode-article">
         <h3><a href="" target="_blank" rel="noopener noreferrer">Name Episode</a></h3>
-        <img src="" alt="">
-        <p>Summary</p>
+        <img class="episode-img" src="" alt="">
+        <p class="episode-summary">Summary</p>
       </article>
     </template>
-
+    <template id="show-card">
+      <article class="show-article">
+        <h2><a href="" target="_blank" rel="noopener noreferrer">Name Show</a></h2>
+        <div class="show-content">
+          <img class="show-img" src="" alt="">
+          <p class="show-summary">Summary</p>
+          <div id="show-info">
+            <div>
+              <label id="rated-label">Rated:</label>
+              <h4 class="show-rated"></h4>
+            </div>
+            <div>
+              <label id="genres-label">Genres:</label>
+              <h4 class="show-genre"></h4>
+            </div>
+            <div>
+              <label id="status-label">Status:</label>
+              <h4 class="show-status"></h4>
+            </div>
+            <div>
+              <label id="runtime-label">Runtime:</label>
+              <h4 class="show-runtime"></h4>
+            </div>
+          </div>
+        </div>
+      </article>
+    </template>
     <!-- Loads YOUR javascript code -->
     <script src="script.js" defer></script>
   </body>

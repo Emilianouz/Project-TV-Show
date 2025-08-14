@@ -7,7 +7,7 @@ html, body {
   height: 100%;
   background-color: rgb(231, 230, 230);
   font-family: fantasy;
-  font-size: 0.9rem;
+  font-size: 1.1rem;
 }
 #root {
   --bg-color: rgb(231, 230, 230);
@@ -37,7 +37,7 @@ html, body {
   padding-right: 30px; /* leave space for arrow */
   cursor: pointer;
 }
-#show-select, #search-select, #search-input {
+#show-select, #search-select, #search-input, #show-search-input {
   min-width: 200px;
   max-width: 300px;
   padding: 10px;
@@ -49,6 +49,28 @@ html, body {
 #search-count {
   padding: 0;
   display: none;
+}
+#shows-view {
+  min-width: 200px;
+  max-width: 300px;
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: #4c87b1;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  margin-right: 10px;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+#shows-view:hover,
+#shows-view:focus {
+  background-color: #005fa3;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 .count-number {
   margin-left: 5px;
@@ -63,9 +85,9 @@ html, body {
   justify-items: center;
   gap: 20px;
 }
-article {
-  width: 300px;
-  height: 480px;
+.episode-article {
+  width: 310px;
+  min-height: 400px;
   align-items: center;
   border-radius: 10px;
   background-color: var(--article-bg-color);
@@ -88,14 +110,15 @@ a {
   text-decoration: none;
   color: inherit;
 }
-img {
+.episode-img {
   display: block;
   margin: 0 auto;
   max-width: 90%;
   border-radius: 14px;
   padding: 20px 10px 10px 10px;
 }
-p {
+.episode-summary {
+  font-size: 0.9rem;
   padding: 10px 20px;
   color: var(--text-color);
   line-height: 1.4;
@@ -105,4 +128,72 @@ p {
   font-size: 1.3rem;
   text-align: center;
   margin-top: 4rem;
+}
+
+/* Show card main layout */
+.show-article {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+  margin-left: 30px;
+  max-width: 1200px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.show-article h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.show-article h2 a {
+  text-decoration: none;
+  color: #000;
+}
+
+.show-article h2 a:hover {
+  text-decoration: underline;
+}
+
+.show-content {
+  display: flex;
+  gap: 20px;
+}
+
+.show-img {
+  flex-shrink: 0;
+  width: 220px;
+  max-height: 310px;
+  border-radius: 8px;
+}
+
+.show-summary {
+  flex: 1;
+  line-height: 1.6;
+}
+
+#show-info {
+  background-color: #fafafa;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 15px 20px;
+  min-width: 200px;
+}
+
+#show-info div {
+  margin-bottom: 10px;
+}
+
+#show-info label {
+  font-weight: bold;
+  display: inline-block;
+  margin-right: 5px;
+}
+
+#show-info h4 {
+  display: inline-block;
+  margin: 0;
+  font-weight: normal;
 }
