@@ -165,7 +165,7 @@ a {
 .show-img {
   flex-shrink: 0;
   width: 220px;
-  height: auto;
+  max-height: 310px;
   border-radius: 8px;
 }
 

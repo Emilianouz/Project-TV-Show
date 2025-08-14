@@ -1,9 +1,7 @@
 const API_BASE = "https://api.tvmaze.com";
 
-// All shows endpoint
+//  endpoints
 const allShowsEndpoint = `${API_BASE}/shows`;
-
-// Endpoint to get episodes for a specific show
 const getEpisodesEndpoint = (showId) => `${API_BASE}/shows/${showId}/episodes`;
 
 const state = {
@@ -17,6 +15,7 @@ const state = {
   query: "",
   idShow: 82,
 };
+
 let showSelectElem;
 let selectElem;
 let showSearchInput;
@@ -31,15 +30,16 @@ const loadingElem = document.getElementById("loading");
 const showsContainer = document.getElementById("shows-container");
 const templateShows = document.getElementById("show-card");
 
-//Creates bar search elements for episodes
+//Creates bar search elements for episode, checking existence from shows
 function createSearchElementsEpisodes() {
   // Button
   if (!document.getElementById("shows-view")) {
     showsViewButton = document.createElement("button");
     showsViewButton.id = "shows-view";
     showsViewButton.textContent = "Back to All Shows";
-    showsViewButton.addEventListener("click", () => renderShowsPage(state.allShows));
-    searchContainer.insertBefore(showsViewButton, countElem);
+    showsViewButton.addEventListener("click", () =>
+      renderShowsPage(state.allShows)
+    );
   } else {
     showsViewButton = document.getElementById("shows-view");
   }
@@ -47,7 +47,6 @@ function createSearchElementsEpisodes() {
   if (!document.getElementById("show-select")) {
     showSelectElem = document.createElement("select");
     showSelectElem.id = "show-select";
-    searchContainer.insertBefore(showSelectElem, countElem);
   } else {
     showSelectElem = document.getElementById("show-select");
   }
@@ -55,7 +54,6 @@ function createSearchElementsEpisodes() {
   if (!document.getElementById("search-select")) {
     selectElem = document.createElement("select");
     selectElem.id = "search-select";
-    searchContainer.insertBefore(selectElem, countElem);
   } else {
     selectElem = document.getElementById("search-select");
   }
@@ -65,7 +63,6 @@ function createSearchElementsEpisodes() {
     searchInput.type = "text";
     searchInput.id = "search-input";
     searchInput.placeholder = "Search episodes...";
-    searchContainer.insertBefore(searchInput, countElem);
   } else {
     searchInput = document.getElementById("search-input");
   }
@@ -103,8 +100,7 @@ async function fetchAllShows() {
 }
 
 async function fetchEpisodesForShow(showId) {
-  // jala los episodios de un show
-  const endpoint = getEpisodesEndpoint(showId); // url de los episodios
+  const endpoint = getEpisodesEndpoint(showId);
 
   if (state.episodesCache[showId]) {
     return state.episodesCache[showId];
@@ -118,9 +114,7 @@ async function fetchEpisodesForShow(showId) {
   state.episodesCache[showId] = data;
   return data;
 }
-/** */ /** */ /** */ /** */ /** mainLoadShow */
 async function loadEpisodesForShow(showId) {
-  // carga los episodios en el estado
   state.currentShowId = showId;
   state.query = "";
   state.selectedIndex = null;
@@ -142,9 +136,7 @@ async function loadEpisodesForShow(showId) {
       handleError("Could not load episodes for selected show.");
     });
 }
-// llena el selector de shows /** */
 function populateShowSelect(shows) {
-  // sort alphabetically (case-insensitive)
   shows.sort((a, b) =>
     a.name.localeCompare(b.name, undefined, { sensitivity: "base" })
   );
@@ -157,26 +149,25 @@ function populateShowSelect(shows) {
     showSelectElem.appendChild(option);
   });
 }
-// evento al seleccionar un show, filtra los episodios /** */
+// setup show selector
 function setupShowSelect() {
   showSelectElem.addEventListener("change", () => {
     const showId = showSelectElem.value;
     if (showId) {
-      console.log(showId);
       renderEpisodesPage(showId);
-      // 
+      //
     }
   });
 }
-// construye la pagina con episodios
+
 function makePageForEpisodes(episodeList) {
-  episodesContainer.innerHTML = "";
+  removeEpisodeCards();
   const episodeCards = episodeList.map(createEpisodeCard);
   episodesContainer.append(...episodeCards);
   countElem.innerHTML = `Displaying <span class="count-number">${state.filteredEpisodes.length} / ${state.allEpisodes.length}</span> episodes`;
   countElem.style.display = "block";
 }
-// crea una carta de episodio
+
 function createEpisodeCard(episode) {
   const { season, number, name, url, image, summary } = episode;
   const card = template.content.cloneNode(true);
@@ -193,20 +184,17 @@ function createEpisodeCard(episode) {
     : "No summary available.";
   return card;
 }
-/** for main */
-// construye la pagina con episodios
+
 function makePageForShows(showList) {
   showList.forEach((show) => {
     const card = createShowCard(show);
     showsContainer.appendChild(card);
   });
-  //episodesContainer.append(...episodeCards);
   countElem.innerHTML = `Found ${state.filteredShows.length} shows `;
   countElem.style.display = "block";
 }
-// crea una carta de episodio
+
 function createShowCard(show) {
-  // name, image, summary, genres, status, rating, and runtime
   const { id, name, image, summary, genres, status, rating, runtime } = show;
   const card = templateShows.content.cloneNode(true);
   const showLink = card.querySelector("h2 a");
@@ -241,8 +229,8 @@ function formatEpisodeNumber(season, number) {
   const pad = (num) => String(num).padStart(2, "0");
   return `S${pad(season)}E${pad(number)}`;
 }
-// arma despu[es de los fos filtros]
-function filterAndRender() {
+
+function filterAndRenderEpisodes() {
   state.selectedIndex = selectElem.value;
   state.query = searchInput.value.trim().toLowerCase();
   // Select filter
@@ -263,19 +251,24 @@ function filterAndRender() {
 
   makePageForEpisodes(state.filteredEpisodes);
 }
-function filterAndRenderShows(){
+
+function filterAndRenderShows() {
   state.query = showSearchInput.value.trim().toLowerCase();
   state.filteredShows = state.allShows.filter((show) => {
     const name = show.name.toLowerCase();
     const summary = (show.summary || "").toLowerCase();
     const genres = (show.genres || []).join(" ").toLowerCase();
-    return name.includes(state.query) || summary.includes(state.query) || genres.includes(state.query);
-    });
+    return (
+      name.includes(state.query) ||
+      summary.includes(state.query) ||
+      genres.includes(state.query)
+    );
+  });
   removeShowCards();
   populateShowSelect(state.filteredShows);
   makePageForShows(state.filteredShows);
 }
-//llena el selector de episodios /** */
+
 function populateEpisodeSelect(episodeList) {
   selectElem.innerHTML = `<option value="">Select an episode</option>`;
   episodeList.forEach((ep, index) => {
@@ -286,36 +279,31 @@ function populateEpisodeSelect(episodeList) {
     selectElem.appendChild(option);
   });
 }
-// evento al seleccionar episodio
+
 function setupEpisodeSelect() {
   selectElem.addEventListener("change", () => {
     // Reset an input when use the select
     searchInput.value = "";
-    filterAndRender();
+    filterAndRenderEpisodes();
   });
 }
-// evento al escribir en el buscador de episodios
+
 function setupSearch() {
   searchInput.addEventListener("input", () => {
     // Reset select when typing in input
     selectElem.value = "";
-    filterAndRender();
+    filterAndRenderEpisodes();
   });
 }
-// evento al escribir en el buscador de shows
+
 function mainSetupSearch() {
   showSearchInput.addEventListener("input", () => {
     // Reset select when typing in input
-    showSelectElem.value = ""; 
-    console.log('aqui el evento de filtrar')
-    //filter select
-    // filter shows
-    // render
-    // search through show names, genres, and summary texts
+    showSelectElem.value = "";
     filterAndRenderShows();
   });
 }
-// manejador de erores ( ni idea)
+
 function handleError(message) {
   if (loadingElem) {
     console.error(message);
@@ -325,14 +313,13 @@ function handleError(message) {
     alert(message);
   }
 }
-// aparentemente algo que dice que esta todo cargando
+
 function setLoading(visible, msg = "Loading...") {
   if (!loadingElem) return;
   loadingElem.textContent = msg;
   loadingElem.style.display = visible ? "block" : "none";
 }
-// va dentro de render
-// crea episodios
+
 function renderEpisodesPage(idShow) {
   removeSearchElementsShows();
   removeShowCards();
@@ -344,14 +331,14 @@ function renderEpisodesPage(idShow) {
   showSelectElem.value = idShow;
   loadEpisodesForShow(idShow);
 }
-// remueve elementos de busqueda de episodios
+// remove elements from search bar of episodes
 function removeSearchElementsEpisodes() {
   if (showsViewButton && showsViewButton.parentNode) showsViewButton.remove();
   if (showSelectElem && showSelectElem.parentNode) showSelectElem.remove();
   if (selectElem && selectElem.parentNode) selectElem.remove();
   if (searchInput && searchInput.parentNode) searchInput.remove();
 }
-//remueve elementos de busqueda de shows
+// remove elements from search bar of shows
 function removeSearchElementsShows() {
   const labelFilteringFor = document.getElementById("filtering-for");
   if (labelFilteringFor) labelFilteringFor.remove();
@@ -364,14 +351,14 @@ function removeShowCards() {
 function removeEpisodeCards() {
   episodesContainer.innerHTML = "";
 }
-function renderShowsPage(shows){
-    removeSearchElementsEpisodes();
-    removeEpisodeCards();
-    createSearchElementsShows();
-    populateShowSelect(shows);
-    mainSetupSearch();
-    setupShowSelect();
-    makePageForShows(shows);
+function renderShowsPage(shows) {
+  removeSearchElementsEpisodes();
+  removeEpisodeCards();
+  createSearchElementsShows();
+  populateShowSelect(shows);
+  mainSetupSearch();
+  setupShowSelect();
+  makePageForShows(shows);
 }
 
 function setup() {
