@@ -8,10 +8,11 @@ const getEpisodesEndpoint = (showId) => `${API_BASE}/shows/${showId}/episodes`;
 
 const state = {
   allShows: [],
+  filteredShows: [],
   episodesCache: {},
   currentShowId: null,
   allEpisodes: [],
-  filtered: [],
+  filteredEpisodes: [],
   selectedIndex: null,
   query: "",
   idShow: 82,
@@ -21,65 +22,74 @@ let selectElem;
 let showSearchInput;
 let searchInput;
 let showsViewButton;
-//const selectElem = document.getElementById("search-select");
-//const searchInput = document.getElementById("search-input");
-const searchContainer = document.getElementById("search-container");
 
+const searchContainer = document.getElementById("search-container");
 const episodesContainer = document.getElementById("episodes-container");
 const countElem = document.getElementById("search-count");
 const template = document.getElementById("episode-card");
 const loadingElem = document.getElementById("loading");
-//const showSelectElem = document.getElementById("show-select");
-
 const showsContainer = document.getElementById("shows-container");
 const templateShows = document.getElementById("show-card");
 
 //Creates bar search elements for episodes
 function createSearchElementsEpisodes() {
-  const searchCountElem = document.getElementById("search-count");
-
-  showsViewButton = document.createElement("button")
-  showsViewButton.name = "shows-view";
-  showsViewButton.id = "shows-view";
-  showsViewButton.textContent = "Show All Shows";
-    showsViewButton.addEventListener("click", () => {
-    setupShowsPage();
-  });
-  searchContainer.insertBefore(showsViewButton, searchCountElem);
-
-  showSelectElem = document.createElement("select");
-  showSelectElem.name = "show-select";
-  showSelectElem.id = "show-select";
-  searchContainer.insertBefore(showSelectElem, searchCountElem);
-
-  selectElem = document.createElement("select");
-  selectElem.name = "search-select";
-  selectElem.id = "search-select";
-  searchContainer.insertBefore(selectElem, searchCountElem);
-
-  searchInput = document.createElement("input");
-  searchInput.type = "text";
-  searchInput.id = "search-input";
-  searchInput.placeholder = "Search episodes...";
-  searchContainer.insertBefore(searchInput, searchCountElem);
+  // Button
+  if (!document.getElementById("shows-view")) {
+    showsViewButton = document.createElement("button");
+    showsViewButton.id = "shows-view";
+    showsViewButton.textContent = "Back to All Shows";
+    showsViewButton.addEventListener("click", () => renderShowsPage(state.allShows));
+    searchContainer.insertBefore(showsViewButton, countElem);
+  } else {
+    showsViewButton = document.getElementById("shows-view");
+  }
+  // Show select
+  if (!document.getElementById("show-select")) {
+    showSelectElem = document.createElement("select");
+    showSelectElem.id = "show-select";
+    searchContainer.insertBefore(showSelectElem, countElem);
+  } else {
+    showSelectElem = document.getElementById("show-select");
+  }
+  // Episode select
+  if (!document.getElementById("search-select")) {
+    selectElem = document.createElement("select");
+    selectElem.id = "search-select";
+    searchContainer.insertBefore(selectElem, countElem);
+  } else {
+    selectElem = document.getElementById("search-select");
+  }
+  // Search input
+  if (!document.getElementById("search-input")) {
+    searchInput = document.createElement("input");
+    searchInput.type = "text";
+    searchInput.id = "search-input";
+    searchInput.placeholder = "Search episodes...";
+    searchContainer.insertBefore(searchInput, countElem);
+  } else {
+    searchInput = document.getElementById("search-input");
+  }
+  // reorder elements in search bar
+  searchContainer.insertBefore(showsViewButton, countElem);
+  searchContainer.insertBefore(showSelectElem, countElem);
+  searchContainer.insertBefore(selectElem, countElem);
+  searchContainer.insertBefore(searchInput, countElem);
 }
 function createSearchElementsShows() {
-  const searchCountElem = document.getElementById("search-count");
+  //const searchCountElem = document.getElementById("search-count");
 
   labelFilteringFor = document.createElement("label");
-  labelFilteringFor.name = "filtering-for";
   labelFilteringFor.id = "filtering-for";
   labelFilteringFor.textContent = "Filtering for ";
-  searchContainer.insertBefore(labelFilteringFor, searchCountElem);
+  searchContainer.insertBefore(labelFilteringFor, countElem);
 
   showSearchInput = document.createElement("input");
   showSearchInput.type = "text";
   showSearchInput.id = "show-search-input";
   showSearchInput.placeholder = "Search Shows...";
-  searchContainer.insertBefore(showSearchInput, searchCountElem);
+  searchContainer.insertBefore(showSearchInput, countElem);
 
   showSelectElem = document.createElement("select");
-  showSelectElem.name = "show-select";
   showSelectElem.id = "show-select";
   searchContainer.appendChild(showSelectElem);
 }
@@ -121,9 +131,9 @@ async function loadEpisodesForShow(showId) {
     .then((episodes) => {
       setLoading(false);
       state.allEpisodes = episodes;
-      state.filtered = episodes;
+      state.filteredEpisodes = episodes;
 
-      makePageForEpisodes(state.filtered);
+      makePageForEpisodes(state.filteredEpisodes);
       populateEpisodeSelect(episodes);
     })
     .catch((error) => {
@@ -152,7 +162,9 @@ function setupShowSelect() {
   showSelectElem.addEventListener("change", () => {
     const showId = showSelectElem.value;
     if (showId) {
-      loadEpisodesForShow(showId);
+      console.log(showId);
+      renderEpisodesPage(showId);
+      // 
     }
   });
 }
@@ -161,7 +173,7 @@ function makePageForEpisodes(episodeList) {
   episodesContainer.innerHTML = "";
   const episodeCards = episodeList.map(createEpisodeCard);
   episodesContainer.append(...episodeCards);
-  countElem.innerHTML = `Displaying <span class="count-number">${state.filtered.length} / ${state.allEpisodes.length}</span> episodes`;
+  countElem.innerHTML = `Displaying <span class="count-number">${state.filteredEpisodes.length} / ${state.allEpisodes.length}</span> episodes`;
   countElem.style.display = "block";
 }
 // crea una carta de episodio
@@ -189,11 +201,10 @@ function makePageForShows(showList) {
     showsContainer.appendChild(card);
   });
   //episodesContainer.append(...episodeCards);
+  countElem.innerHTML = `Found ${state.filteredShows.length} shows `;
+  countElem.style.display = "block";
 }
 // crea una carta de episodio
-function greet(idShow) {
-  alert(`The show is! ${idShow}`);
-}
 function createShowCard(show) {
   // name, image, summary, genres, status, rating, and runtime
   const { id, name, image, summary, genres, status, rating, runtime } = show;
@@ -203,7 +214,7 @@ function createShowCard(show) {
   showLink.addEventListener("click", function (e) {
     e.preventDefault(); // Prevents opening the link
     state.idShow = id;
-    setupEpisodesPage(state.idShow);
+    renderEpisodesPage(state.idShow);
   });
   const showImage = card.querySelector("img");
   showImage.src = image?.medium || ""; // Avoid error if image is missing
@@ -236,21 +247,33 @@ function filterAndRender() {
   state.query = searchInput.value.trim().toLowerCase();
   // Select filter
   if (state.selectedIndex !== "") {
-    state.filtered = state.allEpisodes.filter(
+    state.filteredEpisodes = state.allEpisodes.filter(
       (_, i) => i === Number(state.selectedIndex)
     );
     // Search filter
   } else if (state.query) {
-    state.filtered = state.allEpisodes.filter((episode) => {
+    state.filteredEpisodes = state.allEpisodes.filter((episode) => {
       const name = episode.name.toLowerCase();
       const summary = (episode.summary || "").toLowerCase();
       return name.includes(state.query) || summary.includes(state.query);
     });
   } else {
-    state.filtered = state.allEpisodes;
+    state.filteredEpisodes = state.allEpisodes;
   }
 
-  makePageForEpisodes(state.filtered);
+  makePageForEpisodes(state.filteredEpisodes);
+}
+function filterAndRenderShows(){
+  state.query = showSearchInput.value.trim().toLowerCase();
+  state.filteredShows = state.allShows.filter((show) => {
+    const name = show.name.toLowerCase();
+    const summary = (show.summary || "").toLowerCase();
+    const genres = (show.genres || []).join(" ").toLowerCase();
+    return name.includes(state.query) || summary.includes(state.query) || genres.includes(state.query);
+    });
+  removeShowCards();
+  populateShowSelect(state.filteredShows);
+  makePageForShows(state.filteredShows);
 }
 //llena el selector de episodios /** */
 function populateEpisodeSelect(episodeList) {
@@ -283,12 +306,13 @@ function setupSearch() {
 function mainSetupSearch() {
   showSearchInput.addEventListener("input", () => {
     // Reset select when typing in input
-    selectElem.value = ""; 
+    showSelectElem.value = ""; 
     console.log('aqui el evento de filtrar')
     //filter select
     // filter shows
     // render
-    filterAndRender();
+    // search through show names, genres, and summary texts
+    filterAndRenderShows();
   });
 }
 // manejador de erores ( ni idea)
@@ -309,7 +333,7 @@ function setLoading(visible, msg = "Loading...") {
 }
 // va dentro de render
 // crea episodios
-function setupEpisodesPage(idShow) {
+function renderEpisodesPage(idShow) {
   removeSearchElementsShows();
   removeShowCards();
   createSearchElementsEpisodes();
@@ -340,13 +364,14 @@ function removeShowCards() {
 function removeEpisodeCards() {
   episodesContainer.innerHTML = "";
 }
-function setupShowsPage(){
+function renderShowsPage(shows){
     removeSearchElementsEpisodes();
     removeEpisodeCards();
     createSearchElementsShows();
-    populateShowSelect(state.allShows);
+    populateShowSelect(shows);
     mainSetupSearch();
-    makePageForShows(state.allShows);
+    setupShowSelect();
+    makePageForShows(shows);
 }
 
 function setup() {
@@ -356,27 +381,8 @@ function setup() {
     .then((shows) => {
       setLoading(false);
       state.allShows = shows;
-
-      // createSearchElementsEpisodes();
-      // populateShowSelect(state.allShows);
-      // setupShowSelect();
-      // setupSearch();
-      // setupEpisodeSelect();
-
-      /**
-       * MainSetupShowSearch();
-       * /// MainLoadShows;
-       */
-      createSearchElementsShows();
-      populateShowSelect(state.allShows);
-      mainSetupSearch();
-      makePageForShows(state.allShows);
-
-      //   // Automatically select and load show ID 82.
-      //   // Could be replaced with any other show ID or removed.
-      //   const defaultShowId = "82"; //era defaultShowId en lugar de state.ShowId
-      //   showSelectElem.value = defaultShowId;
-      //   loadEpisodesForShow(defaultShowId);
+      state.filteredShows = shows;
+      renderShowsPage(state.allShows);
     })
     .catch((err) => {
       setLoading(false);
