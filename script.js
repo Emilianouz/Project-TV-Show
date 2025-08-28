@@ -195,7 +195,7 @@ function makePageForShows(showList) {
 }
 
 function createShowCard(show) {
-  const { id, name, image, summary, genres, status, rating, runtime } = show;
+  const { id, name, image, summary, genres, status, rating, runtime } = show; // add network to have country label
   const card = templateShows.content.cloneNode(true);
   const showLink = card.querySelector("h2 a");
   showLink.textContent = name;
@@ -222,6 +222,10 @@ function createShowCard(show) {
   showRated.textContent = rating && rating.average ? rating.average : "N/A";
   const showRuntime = card.querySelector(".show-runtime");
   showRuntime.textContent = runtime;
+
+  // const countryName = card.querySelector(".show-country");
+  // countryName.textContent = network.country.name;
+
   return card;
 }
 
@@ -258,10 +262,12 @@ function filterAndRenderShows() {
     const name = show.name.toLowerCase();
     const summary = (show.summary || "").toLowerCase();
     const genres = (show.genres || []).join(" ").toLowerCase();
+    //const country = (show.network?.country?.name || "").toLowerCase();
     return (
       name.includes(state.query) ||
       summary.includes(state.query) ||
-      genres.includes(state.query)
+      genres.includes(state.query) //||
+     // country.includes(state.query)
     );
   });
   removeShowCards();
